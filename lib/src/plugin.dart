@@ -1,10 +1,10 @@
-part of redstone.headers_plugin;
+part of redstone.security_plugin;
 
-app.RedstonePlugin securityPlugin (GetUserRoles getUserRoles, {String cookieIdField: "id"}) {
+app.RedstonePlugin securityPlugin (GetUserRoles getUserRoles, {String cookieIdField: "userId", String defaultRedirect}) {
 
   return (app.Manager manager) {
     //Controller Group
-    manager.addRouteWrapper(Roles, (Roles metadata, injector, app.Request request, route) async {
+    manager.addRouteWrapper(AdmittedRoles, (AdmittedRoles metadata, injector, app.Request request, route) async {
 
       try {
         List<String> roles = [];
@@ -15,10 +15,12 @@ app.RedstonePlugin securityPlugin (GetUserRoles getUserRoles, {String cookieIdFi
         catch (e, s) {
         }
 
+        var redirect = metadata.failureRedirect != null? metadata.failureRedirect: defaultRedirect;
+
         if (metadata.roles.any((role) => roles.contains(role)))
           return route(injector, request);
-        else if (metadata.failureRedirect != null)
-          return app.redirect(metadata.failureRedirect);
+        else if (redirect != null)
+          return app.redirect(redirect);
         else
           return "AUTHORIZATION ERROR: You don't have permission to access this resource.";
       }
@@ -30,7 +32,6 @@ app.RedstonePlugin securityPlugin (GetUserRoles getUserRoles, {String cookieIdFi
 
 
     manager.addParameterProvider(UserIdMetadata, (UserIdMetadata metadata, Type type, String handlerName, String paramName, app.Request request, injector) {
-
       return getUserId(request, cookieIdField);
     });
   };

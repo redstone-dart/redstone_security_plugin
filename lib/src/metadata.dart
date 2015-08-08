@@ -1,9 +1,9 @@
-part of redstone.headers_plugin;
+part of redstone.security_plugin;
 
-class Roles {
+class AdmittedRoles {
   final List<String> roles;
   final String failureRedirect;
-  const Roles (this.roles, {this.failureRedirect});
+  const AdmittedRoles (this.roles, {this.failureRedirect});
 }
 
 class UserIdMetadata {
